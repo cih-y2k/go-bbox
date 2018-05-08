@@ -1,5 +1,10 @@
 # go-bbox
 
+[![Build Status](https://travis-ci.org/umpc/go-bbox.svg?branch=master)](https://travis-ci.org/umpc/go-bbox)
+[![Coverage Status](https://codecov.io/github/umpc/go-bbox/badge.svg?branch=master)](https://codecov.io/github/umpc/go-bbox?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/umpc/go-bbox)](https://goreportcard.com/report/github.com/umpc/go-bbox)
+[![GoDoc](https://godoc.org/github.com/umpc/go-bbox?status.svg)](https://godoc.org/github.com/umpc/go-bbox)
+
 This package is an implementation of the geospatial algorithms located [here](https://web.archive.org/web/20180508002202/http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates#UsingIndex).
 
 Bronshtein, Semendyayev, Musiol, Mühlig: Handbook of Mathematics. Springer, Berlin.
@@ -25,21 +30,21 @@ import (
 )
 
 func main() {
-  // Finds the min/max points for a rectangular area containing a 32km radius.
-  bboxes := bbox.New(32.0, bbox.Point{
-    Latitude:  0,
-    Longitude: -180,
-  })
-
-  for _, bbox := range bboxes {
-    fmt.Printf("%+v\n", bbox)
-  }
+  // Finds the min/max points for a rectangular area, which will be 276.49km
+  // southwest and northeast of the center point.
+	bboxes := bbox.New(276.494742, bbox.Point{
+		Latitude:  -14.2436432,
+		Longitude: -178.1795257,
+	})
+	for _, bbox := range bboxes {
+		fmt.Printf("%+v\n", bbox)
+	}
 }
 ```
 
 ## Example output
 
 ```
-{Min:{Latitude:-0.28746089091824684 Longitude:179.71253910908138} Max:{Latitude:0.28746089091824684 Longitude:180}}
-{Min:{Latitude:-0.28746089091824684 Longitude:-180} Max:{Latitude:0.28746089091824684 Longitude:-179.71253910908138}}
+{Min:{Latitude:-16.727437727172838 Longitude:179.2578499517392} Max:{Latitude:-11.759848672827163 Longitude:180}}
+{Min:{Latitude:-16.727437727172838 Longitude:-180} Max:{Latitude:-11.759848672827163 Longitude:-175.61690135173924}}
 ```

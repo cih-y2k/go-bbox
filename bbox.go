@@ -35,12 +35,11 @@ func (point Point) toRadians() Point {
 	return point
 }
 
-func (point *Point) calcLatT(angularRadius float64) float64 {
-	return math.Asin(math.Sin(point.Latitude) / math.Cos(angularRadius))
-}
+func (point Point) toDegrees() Point {
+	point.Latitude = toDegrees(point.Latitude)
+	point.Longitude = toDegrees(point.Longitude)
 
-func (point *Point) calcDeltaLon(angularRadius, latT float64) float64 {
-	return math.Acos((math.Cos(angularRadius) - math.Sin(latT)*math.Sin(point.Latitude)) / math.Cos(latT) * math.Cos(point.Latitude))
+	return point
 }
 
 func (point Point) normalizeMeridian() Point {
@@ -49,17 +48,32 @@ func (point Point) normalizeMeridian() Point {
 	return point
 }
 
-func (point Point) toDegrees() Point {
-	point.Latitude = toDegrees(point.Latitude)
-	point.Longitude = toDegrees(point.Longitude)
+func (point *Point) calcLatT(angularRadius float64) float64 {
+	return math.Asin(math.Sin(point.Latitude) / math.Cos(angularRadius))
+}
 
-	return point
+func (point *Point) calcDeltaLon(angularRadius, latT float64) float64 {
+	return math.Acos((math.Cos(angularRadius) - math.Sin(latT)*math.Sin(point.Latitude)) / (math.Cos(latT) * math.Cos(point.Latitude)))
 }
 
 // BBox represents minimum and maximum bounding box point coordinates.
 type BBox struct {
 	Min,
 	Max Point
+}
+
+func (bbox BBox) toDegrees() BBox {
+	bbox.Min = bbox.Min.toDegrees()
+	bbox.Max = bbox.Max.toDegrees()
+
+	return bbox
+}
+
+func (bbox BBox) normalizeMeridian() BBox {
+	bbox.Min = bbox.Min.normalizeMeridian()
+	bbox.Max = bbox.Max.normalizeMeridian()
+
+	return bbox
 }
 
 func (bbox *BBox) applyAngularRadius(angularRadius float64, point Point) *BBox {
@@ -130,7 +144,7 @@ func (bbox *BBox) handleMeridian180() []BBox {
 				},
 				Max: Point{
 					Latitude:  bbox.Max.Latitude,
-					Longitude: -math.Pi,
+					Longitude: math.Pi,
 				},
 			},
 			{
@@ -146,20 +160,6 @@ func (bbox *BBox) handleMeridian180() []BBox {
 		}
 	}
 	return []BBox{*bbox}
-}
-
-func (bbox BBox) normalizeMeridian() BBox {
-	bbox.Min = bbox.Min.normalizeMeridian()
-	bbox.Max = bbox.Max.normalizeMeridian()
-
-	return bbox
-}
-
-func (bbox BBox) toDegrees() BBox {
-	bbox.Min = bbox.Min.toDegrees()
-	bbox.Max = bbox.Max.toDegrees()
-
-	return bbox
 }
 
 // New calculates and returns one or more bounding boxes using a coordinate point
