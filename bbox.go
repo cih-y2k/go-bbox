@@ -64,7 +64,7 @@ func (bbox BBox) normalizeMeridian() BBox {
 
 // New calculates and returns one or more bounding boxes using a coordinate point
 // and radius in kilometers.
-func New(point Point, radius float64) []BBox {
+func New(radius float64, point Point) []BBox {
 	point = point.toRadians()
 
 	const equatorialRadius = 6378137
