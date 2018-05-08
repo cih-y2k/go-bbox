@@ -25,13 +25,13 @@ import (
 )
 
 func main() {
-	point := bbox.Point{
-		Latitude:  0,
-		Longitude: -180,
-	}
+  point := bbox.Point{
+    Latitude:  0,
+    Longitude: -180,
+  }
 
   // Finds the min/max points for a rectangular area containing a 32km radius.
-	bboxes := bbox.New(point, 32)
+  bboxes := bbox.New(point, 32)
   for _, bbox := range bboxes {
     fmt.Printf("%+v\n", bbox)
   }
