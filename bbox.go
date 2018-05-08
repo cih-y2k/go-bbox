@@ -90,7 +90,7 @@ func (bbox *BBox) applyDeltaLon(deltaLon float64, point Point) *BBox {
 	return bbox
 }
 
-func (bbox *BBox) handleNorthPoll() *BBox {
+func (bbox *BBox) handleNorthPole() *BBox {
 	if bbox.Max.Latitude > math.Pi/2 {
 		bbox.Min.Longitude = -math.Pi
 		bbox.Max.Latitude = math.Pi / 2
@@ -99,7 +99,7 @@ func (bbox *BBox) handleNorthPoll() *BBox {
 	return bbox
 }
 
-func (bbox *BBox) handleSouthPoll() *BBox {
+func (bbox *BBox) handleSouthPole() *BBox {
 	if bbox.Min.Latitude < -math.Pi/2 {
 		bbox.Min.Latitude = -math.Pi / 2
 		bbox.Min.Longitude = -math.Pi
@@ -162,13 +162,22 @@ func (bbox *BBox) handleMeridian180() []BBox {
 	return []BBox{*bbox}
 }
 
+func normalizeBBoxes(bboxes []BBox) []BBox {
+	for i, bbox := range bboxes {
+		bboxes[i] = bbox.normalizeMeridian()
+		bboxes[i] = bbox.toDegrees()
+	}
+	return bboxes
+}
+
 // New calculates and returns one or more bounding boxes using a coordinate point
 // and radius in kilometers.
 func New(radius float64, pointVal Point) []BBox {
 	angularRadius := calcAngularRadius(radius)
-	point := pointVal.toRadians()
 
+	point := pointVal.toRadians()
 	bbox := new(BBox)
+
 	bbox = bbox.applyAngularRadius(angularRadius, point)
 
 	latT := point.calcLatT(angularRadius)
@@ -176,14 +185,9 @@ func New(radius float64, pointVal Point) []BBox {
 
 	bbox = bbox.applyDeltaLon(deltaLon, point)
 
-	bbox = bbox.handleNorthPoll()
-	bbox = bbox.handleSouthPoll()
+	bbox = bbox.handleNorthPole()
+	bbox = bbox.handleSouthPole()
 
 	bboxes := bbox.handleMeridian180()
-	for i, bbox := range bboxes {
-		bboxes[i] = bbox.normalizeMeridian()
-		bboxes[i] = bbox.toDegrees()
-	}
-
-	return bboxes
+	return normalizeBBoxes(bboxes)
 }
