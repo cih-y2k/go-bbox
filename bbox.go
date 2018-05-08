@@ -17,6 +17,11 @@ func normalizeMeridian(lon float64) float64 {
 	return math.Mod(lon+3*math.Pi, 2*math.Pi) - math.Pi
 }
 
+func calcAngularRadius(radius float64) float64 {
+	const equatorialRadius = 6378137
+	return 1000 * radius / equatorialRadius
+}
+
 // Point represents a physical point on Earth, referenced by latitude and longitude coordinates.
 type Point struct {
 	Latitude,
@@ -49,6 +54,20 @@ type BBox struct {
 	Max Point
 }
 
+func (bbox *BBox) applyAngularRadius(angularRadius float64, point Point) *BBox {
+	bbox.Min.Latitude = point.Latitude - angularRadius
+	bbox.Max.Latitude = point.Latitude + angularRadius
+
+	return bbox
+}
+
+func (bbox *BBox) applyDeltaLon(deltaLon float64, point Point) *BBox {
+	bbox.Min.Longitude = point.Longitude - deltaLon
+	bbox.Max.Longitude = point.Longitude + deltaLon
+
+	return bbox
+}
+
 func (bbox BBox) toDegrees() BBox {
 	bbox.Min = bbox.Min.toDegrees()
 	bbox.Max = bbox.Max.toDegrees()
@@ -63,43 +82,33 @@ func (bbox BBox) normalizeMeridian() BBox {
 	return bbox
 }
 
-// New calculates and returns one or more bounding boxes using a coordinate point
-// and radius in kilometers.
-func New(radius float64, point Point) []BBox {
-	point = point.toRadians()
+func (point *Point) calcLatT(angularRadius float64) float64 {
+	return math.Asin(math.Sin(point.Latitude) / math.Cos(angularRadius))
+}
 
-	const equatorialRadius = 6378137
-	angularRadius := 1000 * radius / equatorialRadius
+func (point *Point) calcDeltaLon(angularRadius, latT float64) float64 {
+	return math.Acos((math.Cos(angularRadius) - math.Sin(latT)*math.Sin(point.Latitude)) / math.Cos(latT) * math.Cos(point.Latitude))
+}
 
-	bbox := BBox{
-		Min: Point{
-			Latitude: point.Latitude - angularRadius,
-		},
-		Max: Point{
-			Latitude: point.Latitude + angularRadius,
-		},
-	}
-
-	latT := math.Asin(math.Sin(point.Latitude) / math.Cos(angularRadius))
-	deltaLon := math.Acos((math.Cos(angularRadius) - math.Sin(latT)*math.Sin(point.Latitude)) / math.Cos(latT) * math.Cos(point.Latitude))
-
-	bbox.Min.Longitude = point.Longitude - deltaLon
-	bbox.Max.Longitude = point.Longitude + deltaLon
-
+func (bbox *BBox) handleNorthPoll() *BBox {
 	if bbox.Max.Latitude > math.Pi/2 {
-		// Handle the North Poll.
 		bbox.Min.Longitude = -math.Pi
 		bbox.Max.Latitude = math.Pi / 2
 		bbox.Max.Longitude = math.Pi
 	}
+	return bbox
+}
 
+func (bbox *BBox) handleSouthPoll() *BBox {
 	if bbox.Min.Latitude < -math.Pi/2 {
-		// Handle the South Poll.
-		bbox.Min.Longitude = -math.Pi / 2
-		bbox.Min.Latitude = -math.Pi
+		bbox.Min.Latitude = -math.Pi / 2
+		bbox.Min.Longitude = -math.Pi
 		bbox.Max.Longitude = math.Pi
 	}
+	return bbox
+}
 
+func (bbox *BBox) handleMeridian180() []BBox {
 	bboxes := make([]BBox, 0, 1)
 	if bbox.Min.Longitude < -math.Pi {
 		// Handle wraparound if minimum longitude is less than -180 degrees.
@@ -113,7 +122,7 @@ func New(radius float64, point Point) []BBox {
 				Longitude: math.Pi,
 			},
 		})
-		bboxes = append(bboxes, BBox{
+		return append(bboxes, BBox{
 			Min: Point{
 				Latitude:  bbox.Min.Latitude,
 				Longitude: -math.Pi,
@@ -135,7 +144,7 @@ func New(radius float64, point Point) []BBox {
 				Longitude: -math.Pi,
 			},
 		})
-		bboxes = append(bboxes, BBox{
+		return append(bboxes, BBox{
 			Min: Point{
 				Latitude:  bbox.Min.Latitude,
 				Longitude: -math.Pi,
@@ -146,9 +155,28 @@ func New(radius float64, point Point) []BBox {
 			},
 		})
 	} else {
-		bboxes = append(bboxes, bbox)
+		return append(bboxes, *bbox)
 	}
+}
 
+// New calculates and returns one or more bounding boxes using a coordinate point
+// and radius in kilometers.
+func New(radius float64, pointVal Point) []BBox {
+	angularRadius := calcAngularRadius(radius)
+	point := pointVal.toRadians()
+
+	bbox := new(BBox)
+	bbox = bbox.applyAngularRadius(angularRadius, point)
+
+	latT := point.calcLatT(angularRadius)
+	deltaLon := point.calcDeltaLon(angularRadius, latT)
+
+	bbox = bbox.applyDeltaLon(deltaLon, point)
+
+	bbox = bbox.handleNorthPoll()
+	bbox = bbox.handleSouthPoll()
+
+	bboxes := bbox.handleMeridian180()
 	for i, bbox := range bboxes {
 		bboxes[i] = bbox.normalizeMeridian()
 		bboxes[i] = bbox.toDegrees()
