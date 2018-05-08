@@ -32,13 +32,13 @@ import (
 func main() {
   // Finds the min/max points for a rectangular area, which will be 276.49km
   // southwest and northeast of the center point.
-	bboxes := bbox.New(276.494742, bbox.Point{
-		Latitude:  -14.2436432,
-		Longitude: -178.1795257,
-	})
-	for _, bbox := range bboxes {
-		fmt.Printf("%+v\n", bbox)
-	}
+  bboxes := bbox.New(276.494742, bbox.Point{
+    Latitude:  -14.2436432,
+    Longitude: -178.1795257,
+  })
+  for _, bbox := range bboxes {
+    fmt.Printf("%+v\n", bbox)
+  }
 }
 ```
 
