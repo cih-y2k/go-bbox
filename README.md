@@ -19,9 +19,9 @@ go get -u github.com/umpc/go-bbox
 package main
 
 import (
-	"fmt"
+  "fmt"
 
-	"github.com/umpc/go-bbox"
+  "github.com/umpc/go-bbox"
 )
 
 func main() {
