@@ -1,6 +1,7 @@
 // This package is an implementation of the geospatial algorithms located here:
 // https://web.archive.org/web/20180508002202/http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates#UsingIndex
 // Bronshtein, Semendyayev, Musiol, Mühlig: Handbook of Mathematics. Springer, Berlin.
+//
 // This port uses Earth's equatorial radius for compatibility with Google Maps,
 // Bing Maps, and Mapbox.
 // Ported by Justin Lowery (ISC License)
