@@ -95,54 +95,57 @@ func (bbox *BBox) handleSouthPoll() *BBox {
 }
 
 func (bbox *BBox) handleMeridian180() []BBox {
-	bboxes := make([]BBox, 0, 1)
+	// Handle wraparound if minimum longitude is less than -180 degrees.
 	if bbox.Min.Longitude < -math.Pi {
-		// Handle wraparound if minimum longitude is less than -180 degrees.
-		bboxes = append(bboxes, BBox{
-			Min: Point{
-				Latitude:  bbox.Min.Latitude,
-				Longitude: bbox.Min.Longitude + 2*math.Pi,
+		return []BBox{
+			{
+				Min: Point{
+					Latitude:  bbox.Min.Latitude,
+					Longitude: bbox.Min.Longitude + 2*math.Pi,
+				},
+				Max: Point{
+					Latitude:  bbox.Max.Latitude,
+					Longitude: math.Pi,
+				},
 			},
-			Max: Point{
-				Latitude:  bbox.Max.Latitude,
-				Longitude: math.Pi,
+			{
+				Min: Point{
+					Latitude:  bbox.Min.Latitude,
+					Longitude: -math.Pi,
+				},
+				Max: Point{
+					Latitude:  bbox.Max.Latitude,
+					Longitude: bbox.Max.Longitude,
+				},
 			},
-		})
-		return append(bboxes, BBox{
-			Min: Point{
-				Latitude:  bbox.Min.Latitude,
-				Longitude: -math.Pi,
-			},
-			Max: Point{
-				Latitude:  bbox.Max.Latitude,
-				Longitude: bbox.Max.Longitude,
-			},
-		})
-	} else if bbox.Max.Longitude > math.Pi {
-		// Handle wraparound if maximum longitude is greater than 180 degrees.
-		bboxes = append(bboxes, BBox{
-			Min: Point{
-				Latitude:  bbox.Min.Latitude,
-				Longitude: bbox.Min.Longitude,
-			},
-			Max: Point{
-				Latitude:  bbox.Max.Latitude,
-				Longitude: -math.Pi,
-			},
-		})
-		return append(bboxes, BBox{
-			Min: Point{
-				Latitude:  bbox.Min.Latitude,
-				Longitude: -math.Pi,
-			},
-			Max: Point{
-				Latitude:  bbox.Max.Latitude,
-				Longitude: bbox.Max.Longitude - 2*math.Pi,
-			},
-		})
-	} else {
-		return append(bboxes, *bbox)
+		}
 	}
+	// Handle wraparound if maximum longitude is greater than 180 degrees.
+	if bbox.Max.Longitude > math.Pi {
+		return []BBox{
+			{
+				Min: Point{
+					Latitude:  bbox.Min.Latitude,
+					Longitude: bbox.Min.Longitude,
+				},
+				Max: Point{
+					Latitude:  bbox.Max.Latitude,
+					Longitude: -math.Pi,
+				},
+			},
+			{
+				Min: Point{
+					Latitude:  bbox.Min.Latitude,
+					Longitude: -math.Pi,
+				},
+				Max: Point{
+					Latitude:  bbox.Max.Latitude,
+					Longitude: bbox.Max.Longitude - 2*math.Pi,
+				},
+			},
+		}
+	}
+	return []BBox{*bbox}
 }
 
 func (bbox BBox) normalizeMeridian() BBox {
