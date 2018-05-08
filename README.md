@@ -7,8 +7,6 @@
 
 This package is an implementation of the geospatial algorithms located [here](https://web.archive.org/web/20180508002202/http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates#UsingIndex).
 
-Bronshtein, Semendyayev, Musiol, Mühlig: Handbook of Mathematics. Springer, Berlin.
-
 This port uses Earth's equatorial radius, 6,378,137 meters, for compatibility
 with online mapping services such as Google Maps, Bing Maps, and Mapbox.
 
@@ -48,3 +46,7 @@ func main() {
 {Min:{Latitude:-16.727437727172838 Longitude:179.2578499517392} Max:{Latitude:-11.759848672827163 Longitude:180}}
 {Min:{Latitude:-16.727437727172838 Longitude:-180} Max:{Latitude:-11.759848672827163 Longitude:-175.61690135173924}}
 ```
+
+## Source:
+
+* Bronshtein, Semendyayev, Musiol, Mühlig: Handbook of Mathematics. Springer, Berlin.
