@@ -174,16 +174,14 @@ func normalizeBBoxes(bboxes []BBox) []BBox {
 // and radius in kilometers.
 func New(radius float64, pointVal Point) []BBox {
 	angularRadius := calcAngularRadius(radius)
+
 	point := pointVal.toRadians()
-
-	bbox := BBox{}
-	bbox = bbox.applyAngularRadius(angularRadius, point)
-
 	latT := point.calcLatT(angularRadius)
 	deltaLon := point.calcDeltaLon(angularRadius, latT)
 
+	bbox := BBox{}
+	bbox = bbox.applyAngularRadius(angularRadius, point)
 	bbox = bbox.applyDeltaLon(deltaLon, point)
-
 	bbox = bbox.handleNorthPole()
 	bbox = bbox.handleSouthPole()
 
