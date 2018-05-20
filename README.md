@@ -76,4 +76,4 @@ ok      github.com/umpc/go-bbox 15.109s
 
 ## References:
 
-* Bronshtein, Semendyayev, Musiol, Mühlig: Handbook of Mathematics. Springer, Berlin. ISBN-13: 978-3817120079
+* Bronshtein, Semendyayev, Musiol, Mühlig: Handbook of Mathematics. Springer, Berlin. ISBN-13: 978-3817120079.
