@@ -194,6 +194,29 @@ func TestSuva(t *testing.T) {
 	testBBoxes(t, radius, point, bboxesAssertionVal, true)
 }
 
+func TestNorthPole(t *testing.T) {
+	const radius = 85.245
+	point := Point{
+		Latitude:  89.6349537,
+		Longitude: 51.3556355,
+	}
+	bboxesAssertionVal := []BBox{
+		{
+			Min: Point{
+				Latitude:  88.86918483605231,
+				Longitude: -180,
+			},
+			Max: Point{
+				Latitude:  90,
+				Longitude: 180,
+			},
+		},
+	}
+	// Point does not trigger a typical 180 deg wraparound because it crosses
+	// the north pole.
+	testBBoxes(t, radius, point, bboxesAssertionVal, false)
+}
+
 func TestSouthPole(t *testing.T) {
 	const radius = 194.645
 	point := Point{
@@ -217,25 +240,87 @@ func TestSouthPole(t *testing.T) {
 	testBBoxes(t, radius, point, bboxesAssertionVal, false)
 }
 
-func TestNorthPole(t *testing.T) {
-	const radius = 85.245
-	point := Point{
-		Latitude:  89.6349537,
-		Longitude: 51.3556355,
+func BenchmarkNewEmpty(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bboxes := New(0, Point{})
+		if bboxes == nil {
+		}
 	}
-	bboxesAssertionVal := []BBox{
-		{
-			Min: Point{
-				Latitude:  88.86918483605231,
-				Longitude: -180,
-			},
-			Max: Point{
-				Latitude:  90,
-				Longitude: 180,
-			},
-		},
+}
+
+func BenchmarkNYC(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bboxes := New(123.123654, Point{
+			Latitude:  40.7491902,
+			Longitude: -74.0057076,
+		})
+		if bboxes == nil {
+		}
 	}
-	// Point does not trigger a typical 180 deg wraparound because it crosses
-	// the north pole.
-	testBBoxes(t, radius, point, bboxesAssertionVal, false)
+}
+
+func BenchmarkLondon(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bboxes := New(322.14, Point{
+			Latitude:  51.5073482,
+			Longitude: -0.1452675,
+		})
+		if bboxes == nil {
+		}
+	}
+}
+
+func BenchmarkMontevideo(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bboxes := New(56.0, Point{
+			Latitude:  -34.8283457,
+			Longitude: -56.3119767,
+		})
+		if bboxes == nil {
+		}
+	}
+}
+
+func BenchmarkToloke(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bboxes := New(276.494742, Point{
+			Latitude:  -14.2436432,
+			Longitude: -178.1795257,
+		})
+		if bboxes == nil {
+		}
+	}
+}
+
+func BenchmarkSuva(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bboxes := New(453.2345, Point{
+			Latitude:  -18.1236158,
+			Longitude: 178.427969,
+		})
+		if bboxes == nil {
+		}
+	}
+}
+
+func BenchmarkNorthPole(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bboxes := New(85.245, Point{
+			Latitude:  89.6349537,
+			Longitude: 51.3556355,
+		})
+		if bboxes == nil {
+		}
+	}
+}
+
+func BenchmarkSouthPole(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bboxes := New(194.645, Point{
+			Latitude:  -88.6349537,
+			Longitude: 51.3556355,
+		})
+		if bboxes == nil {
+		}
+	}
 }

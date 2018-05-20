@@ -76,21 +76,21 @@ func (bbox BBox) normalizeMeridian() BBox {
 	return bbox
 }
 
-func (bbox *BBox) applyAngularRadius(angularRadius float64, point Point) *BBox {
+func (bbox BBox) applyAngularRadius(angularRadius float64, point Point) BBox {
 	bbox.Min.Latitude = point.Latitude - angularRadius
 	bbox.Max.Latitude = point.Latitude + angularRadius
 
 	return bbox
 }
 
-func (bbox *BBox) applyDeltaLon(deltaLon float64, point Point) *BBox {
+func (bbox BBox) applyDeltaLon(deltaLon float64, point Point) BBox {
 	bbox.Min.Longitude = point.Longitude - deltaLon
 	bbox.Max.Longitude = point.Longitude + deltaLon
 
 	return bbox
 }
 
-func (bbox *BBox) handleNorthPole() *BBox {
+func (bbox BBox) handleNorthPole() BBox {
 	if bbox.Max.Latitude > math.Pi/2 {
 		bbox.Min.Longitude = -math.Pi
 		bbox.Max.Latitude = math.Pi / 2
@@ -99,7 +99,7 @@ func (bbox *BBox) handleNorthPole() *BBox {
 	return bbox
 }
 
-func (bbox *BBox) handleSouthPole() *BBox {
+func (bbox BBox) handleSouthPole() BBox {
 	if bbox.Min.Latitude < -math.Pi/2 {
 		bbox.Min.Latitude = -math.Pi / 2
 		bbox.Min.Longitude = -math.Pi
@@ -108,7 +108,7 @@ func (bbox *BBox) handleSouthPole() *BBox {
 	return bbox
 }
 
-func (bbox *BBox) handleMeridian180() []BBox {
+func (bbox BBox) handleMeridian180() []BBox {
 	// Handle wraparound if minimum longitude is less than -180 degrees.
 	if bbox.Min.Longitude < -math.Pi {
 		return []BBox{
@@ -159,7 +159,7 @@ func (bbox *BBox) handleMeridian180() []BBox {
 			},
 		}
 	}
-	return []BBox{*bbox}
+	return []BBox{bbox}
 }
 
 func normalizeBBoxes(bboxes []BBox) []BBox {
@@ -174,10 +174,9 @@ func normalizeBBoxes(bboxes []BBox) []BBox {
 // and radius in kilometers.
 func New(radius float64, pointVal Point) []BBox {
 	angularRadius := calcAngularRadius(radius)
-
 	point := pointVal.toRadians()
-	bbox := new(BBox)
 
+	bbox := BBox{}
 	bbox = bbox.applyAngularRadius(angularRadius, point)
 
 	latT := point.calcLatT(angularRadius)
