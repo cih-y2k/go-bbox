@@ -73,6 +73,7 @@ ok      github.com/umpc/go-bbox 15.109s
 
 * CPU: Intel Core i7-4790k
 * Memory: DDR3-1600
+* Go: 1.10.2
 
 ## References:
 
