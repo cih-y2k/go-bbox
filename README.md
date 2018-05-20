@@ -52,6 +52,8 @@ func main() {
 {Min:{Latitude:-16.727437727172838 Longitude:-180} Max:{Latitude:-11.759848672827163 Longitude:-175.61690135173924}}
 ```
 
+This example shows how bounds that cross the antimeridian are represented.
+
 ## Benchmark results
 
 ```sh
