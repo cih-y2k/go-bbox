@@ -12,9 +12,12 @@ go get -u github.com/umpc/go-bbox
 ```
 
 * Earth's equatorial radius of 6,378,137 meters is used for compatibility
-with online mapping services such as Google Maps, Bing Maps, and Mapbox.
+with online mapping services such as:
+  * Google Maps
+  * Bing Maps
+  * Mapbox
 * Bounds that cross the antimeridian are represented using two bounding boxes.
-* Bounds that cross the poles are represented using a bounding box that has:
+* Bounds that cross the poles are represented using a single bounding box that has:
   * a min longitude of -180 degrees
   * a max longitude of 180 degrees
 
