@@ -5,16 +5,18 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/umpc/go-bbox)](https://goreportcard.com/report/github.com/umpc/go-bbox)
 [![GoDoc](https://godoc.org/github.com/umpc/go-bbox?status.svg)](https://godoc.org/github.com/umpc/go-bbox)
 
-This package is an implementation of the geospatial algorithms located [here](https://web.archive.org/web/20180508002202/http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates#UsingIndex).
-
-This port uses Earth's equatorial radius, 6,378,137 meters, for compatibility
-with online mapping services such as Google Maps, Bing Maps, and Mapbox.
-
-The 180th meridian is handled by the caller searching within two bounding boxes.
+This package is an implementation of a geospatial bounding box algorithm located [here](https://web.archive.org/web/20180508002202/http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates#UsingIndex).
 
 ```sh
 go get -u github.com/umpc/go-bbox
 ```
+
+* Earth's equatorial radius of 6,378,137 meters is used for compatibility
+with online mapping services such as Google Maps, Bing Maps, and Mapbox.
+* Bounds that cross the antimeridian are represented using two bounding boxes.
+* Bounds that cross the poles are represented using a bounding box that has:
+  * a min longitude of -180 degrees
+  * a max longitude of 180 degrees
 
 ## Example usage
 
@@ -47,6 +49,28 @@ func main() {
 {Min:{Latitude:-16.727437727172838 Longitude:-180} Max:{Latitude:-11.759848672827163 Longitude:-175.61690135173924}}
 ```
 
-## Source:
+## Benchmark results
 
-* Bronshtein, Semendyayev, Musiol, Mühlig: Handbook of Mathematics. Springer, Berlin.
+```sh
+$ go test -bench=.
+goos: linux
+goarch: amd64
+pkg: github.com/umpc/go-bbox
+BenchmarkNewEmpty-8             10000000               181 ns/op
+BenchmarkNYC-8                   5000000               263 ns/op
+BenchmarkLondon-8                5000000               267 ns/op
+BenchmarkMontevideo-8            5000000               268 ns/op
+BenchmarkToloke-8                5000000               320 ns/op
+BenchmarkSuva-8                  5000000               322 ns/op
+BenchmarkNorthPole-8            10000000               200 ns/op
+BenchmarkSouthPole-8            10000000               202 ns/op
+PASS
+ok      github.com/umpc/go-bbox 15.109s
+```
+
+* CPU: Intel Core i7-4790k
+* Memory: DDR3-1600
+
+## References:
+
+* Bronshtein, Semendyayev, Musiol, Mühlig: Handbook of Mathematics. Springer, Berlin. ISBN-13: 978-3817120079
